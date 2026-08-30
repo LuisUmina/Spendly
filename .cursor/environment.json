@@ -1,0 +1,20 @@
+{
+  "name": "Spendly (ezBookkeeping)",
+  "install": ".cursor/install.sh",
+  "terminals": [
+    {
+      "name": "backend",
+      "command": "CGO_ENABLED=1 go build -o ezbookkeeping ezbookkeeping.go && if [ -f .env ]; then exec ./scripts/with-env.sh ./ezbookkeeping server run; else exec ./ezbookkeeping server run; fi",
+      "description": "ezBookkeeping Go API server on http://localhost:8080. Rebuilds from current source, then runs it. Defaults to SQLite; if a .env file exists it is injected via scripts/with-env.sh (Supabase/PostgreSQL path)."
+    },
+    {
+      "name": "frontend",
+      "command": "npm run serve",
+      "description": "Vite dev server (HMR) for the Vue 3 SPA on http://localhost:8081. Proxies /api, /mcp, /oauth2, /avatar, /pictures, /icons, /qrcode, /proxy, /_AMapService and */server_settings.js to the backend on :8080. Always work against :8081."
+    }
+  ],
+  "ports": [
+    { "name": "frontend (vite dev server)", "port": 8081 },
+    { "name": "backend api", "port": 8080 }
+  ]
+}
