@@ -1,0 +1,91 @@
+# Render Blueprint — Spendly / ezBookkeeping
+#
+# Declarative service definition. Render reads this when you create a Blueprint
+# from the repository. Values marked `sync: false` are NOT stored here: Render
+# prompts for them on first deploy and keeps them as service secrets.
+#
+# See docs/deployment-render.md for what each setting is for and which ones to
+# verify against Render's current documentation.
+
+services:
+  - type: web
+    name: spendly
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    # Matches the Supabase project region (us-west-2) to avoid a cross-country
+    # round trip on every query.
+    region: oregon
+    branch: personal
+    healthCheckPath: /healthz.json
+
+    envVars:
+      # --- Port. Render injects PORT; ezBookkeeping reads EBK_SERVER_HTTP_PORT.
+      # Both must agree or the health check never passes.
+      - key: PORT
+        value: 8080
+      - key: EBK_SERVER_HTTP_PORT
+        value: 8080
+      - key: EBK_SERVER_HTTP_ADDR
+        value: 0.0.0.0
+
+      # --- Database (Supabase, session pooler on 5432)
+      - key: EBK_DATABASE_TYPE
+        value: postgres
+      - key: EBK_DATABASE_HOST
+        value: aws-0-us-west-2.pooler.supabase.com:5432
+      - key: EBK_DATABASE_NAME
+        value: postgres
+      - key: EBK_DATABASE_USER
+        sync: false
+      - key: EBK_DATABASE_PASSWD
+        sync: false
+      - key: EBK_DATABASE_SSL_MODE
+        value: require
+      - key: EBK_DATABASE_MAX_OPEN_CONN
+        value: 10
+      - key: EBK_DATABASE_MAX_IDLE_CONN
+        value: 2
+      - key: EBK_DATABASE_CONN_MAX_LIFETIME
+        value: 1800
+      - key: EBK_DATABASE_AUTO_UPDATE_DATABASE
+        value: true
+      - key: EBK_DATABASE_LOG_QUERY
+        value: false
+
+      # --- Logging. Console only; the filesystem is ephemeral.
+      - key: EBK_LOG_MODE
+        value: console
+      - key: EBK_LOG_LEVEL
+        value: info
+
+      # --- Server URLs. Update after the first deploy, once the hostname exists.
+      - key: EBK_SERVER_PROTOCOL
+        value: http
+      - key: EBK_SERVER_DOMAIN
+        sync: false
+      - key: EBK_SERVER_ROOT_URL
+        sync: false
+
+      # --- Security
+      - key: EBK_SECURITY_SECRET_KEY
+        sync: false
+      - key: EBK_SECURITY_TRUSTED_PROXY_IPS
+        value: 10.0.0.0/8,169.254.0.0/16,127.0.0.0/8,172.16.0.0/12,192.168.0.0/16
+
+      # --- UUID generator. Unique per instance; free plan runs exactly one.
+      - key: EBK_UUID_SERVER_ID
+        value: 0
+
+      # --- Storage. No persistent disk on the free plan, so uploads stay off.
+      # Gravatar is external and writes nothing to disk.
+      - key: EBK_USER_AVATAR_PROVIDER
+        value: gravatar
+      - key: EBK_USER_ENABLE_TRANSACTION_PICTURE
+        value: false
+      - key: EBK_USER_ENABLE_CUSTOM_ICON
+        value: false
+
+      # --- Registration. Set to false once your account exists.
+      - key: EBK_USER_ENABLE_REGISTER
+        value: true
