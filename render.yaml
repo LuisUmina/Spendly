@@ -11,7 +11,10 @@ services:
   - type: web
     name: spendly
     runtime: docker
-    dockerfilePath: ./Dockerfile
+    # Not the upstream Dockerfile: that one runs lint and the full test suite on
+    # every build, and some tests call third-party APIs over the network.
+    # See the header of Dockerfile.render.
+    dockerfilePath: ./Dockerfile.render
     plan: free
     # Matches the Supabase project region (us-west-2) to avoid a cross-country
     # round trip on every query.
