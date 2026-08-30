@@ -89,6 +89,13 @@ services:
       - key: EBK_USER_ENABLE_CUSTOM_ICON
         value: false
 
-      # --- Registration. Set to false once your account exists.
+      # --- Registration. Closed: the service is on a public URL, so leaving
+      # this open lets anyone create an account in the database.
+      #
+      # To create the first account on a fresh deployment, either flip this to
+      # true just long enough to register and then set it back, or create the
+      # user from the CLI without opening registration at all:
+      #   ezbookkeeping userdata user-add --username X --email Y --nickname Z \
+      #       --password W --default-currency USD
       - key: EBK_USER_ENABLE_REGISTER
-        value: true
+        value: false
