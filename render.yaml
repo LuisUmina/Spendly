@@ -56,6 +56,15 @@ services:
       - key: EBK_DATABASE_LOG_QUERY
         value: false
 
+      # --- MCP server, exposed at POST /mcp for AI agents (Grok Bot).
+      # Authentication is a per-user MCP token, so the endpoint is not open.
+      #
+      # mcp_allowed_remote_ips is deliberately left unset: it would be the way
+      # to restrict callers by address, but Grok Bot runs on xAI machines whose
+      # addresses are neither known nor stable, so the token is the only control.
+      - key: EBK_MCP_ENABLE_MCP
+        value: true
+
       # --- Logging. Console only; the filesystem is ephemeral.
       - key: EBK_LOG_MODE
         value: console
