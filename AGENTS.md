@@ -27,6 +27,11 @@ configuration are all still `ezbookkeeping`. **This is intentional** — see "Up
 - Do not `push` or open PRs unless explicitly asked.
 - Never push to `upstream`.
 
+> **`personal` is the deployed branch.** A Render Blueprint watches it and syncs automatically, so a push
+> reaches the live service without a further approval step. Treat every commit here as a release: changes to
+> `render.yaml` alter the running configuration, and changes to `Dockerfile.render` trigger a rebuild. This is
+> the strongest reason to keep pushes deliberate rather than routine.
+
 ### 2. Maintain upstream compatibility
 
 This fork must be able to absorb upstream changes indefinitely. Every line that diverges from upstream is a
@@ -79,7 +84,9 @@ Additional rules:
 - `.env` files are in `.gitignore` (`.env`, `**/.env`). That is the right place for local credentials.
   Start from `.env.example`, which *is* committed and therefore never holds real values.
 - The binary does not read `.env` on its own. Use `scripts/with-env.ps1` / `scripts/with-env.sh` to inject it.
-  Supabase setup is documented in `docs/supabase-postgres.md`.
+  Supabase setup is documented in `docs/supabase-postgres.md`, deployment in `docs/deployment-render.md`.
+- Production secrets live in the Render dashboard, declared in `render.yaml` as `sync: false` so the repository
+  never holds a value. Keep new secrets on that path; do not give them a literal in the Blueprint.
 - Do not create new config files holding secrets that `.gitignore` does not already cover.
 - `data/`, `log/` and `storage/` are ignored and hold user data. Never force them into a commit, and never
   paste their contents into commits, issues or messages.
@@ -131,6 +138,13 @@ Types: `backend`, `frontend`, `package`, `docker`. Flags: `--no-lint`, `--no-tes
 **Non-obvious requirement:** the backend build requires `gcc` on the PATH and forces `CGO_ENABLED=1` with
 static linking, because of the `mattn/go-sqlite3` driver. On Windows this means MinGW/TDM-GCC. It applies even
 when using PostgreSQL, because the SQLite driver is compiled regardless.
+
+For local work against PostgreSQL only, `CGO_ENABLED=0` builds and tests fine — `lib/pq` is pure Go and only
+the SQLite driver needs a compiler. The resulting binary cannot use SQLite, so never ship it.
+
+**Two Dockerfiles, and they are not interchangeable.** `Dockerfile` is upstream's and must stay untouched.
+`Dockerfile.render` is the one the deployment builds: same image, but without lint and tests, plus a `.git`
+stub the frontend build needs. Edit the second one, never the first.
 
 ### Binary CLI
 
@@ -189,6 +203,11 @@ A UI change usually has to be applied in both variants, or in `views/base/` when
   The INI default is `127.0.0.1:3306`, which is the MySQL port.
 - The backend generates `/server_settings.js` at runtime to tell the frontend which features are enabled.
   Adding a feature toggle means touching `pkg/api/server_settings.go` and `src/lib/server_settings.ts`.
+- **An empty `EBK_*` variable cannot clear a setting.** `getConfigItemStringValue` treats an empty value as
+  unset and falls back to the INI, so `EBK_USER_AVATAR_PROVIDER=` leaves the INI default in place. Blanking a
+  value requires editing `conf/ezbookkeeping.ini`, which is tracked. Switch the value instead of emptying it.
+- Some settings are validated only at boot, not at load: an unrecognised `avatar_provider`, for example, aborts
+  startup rather than falling back. Verify a config change by starting the binary, not by reading the config.
 
 ## Code style
 
