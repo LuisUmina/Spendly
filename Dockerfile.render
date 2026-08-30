@@ -51,6 +51,26 @@ WORKDIR /go/src/github.com/mayswind/ezbookkeeping
 COPY . .
 RUN docker/frontend-build-pre-setup.sh
 RUN apk add git
+
+# vite.config.ts embeds the commit hash with git.short() from git-rev-sync,
+# which reads .git straight off the filesystem and throws
+# "[git-rev-sync] no git repository found" when it finds none. Render's Docker
+# build context does not include .git, so the frontend build aborts before Vite
+# even starts.
+#
+# git-rev-sync treats a HEAD that is not a "ref: ..." line as a detached head
+# and returns its contents verbatim, so a single file holding a bare SHA is
+# enough. No git repository, no commit, no git binary involved.
+#
+# The guard leaves real checkouts alone, so a local `docker build` still reports
+# the true commit. Without SOURCE_COMMIT the About page shows 0000000, which is
+# cosmetic.
+ARG SOURCE_COMMIT
+RUN if [ ! -d .git ]; then \
+      mkdir -p .git && \
+      echo "${SOURCE_COMMIT:-0000000000000000000000000000000000000000}" > .git/HEAD; \
+    fi
+
 RUN ./build.sh frontend --no-lint --no-test
 
 # Package docker image
