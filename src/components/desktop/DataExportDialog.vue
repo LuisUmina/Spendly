@@ -1,17 +1,17 @@
 <template>
-    <v-dialog width="1000" v-model="showState">
+    <v-dialog content-class="data-export-dialog-content" width="1000" height="600" v-model="showState">
         <one-column-dialog-layout content-class="pa-0"
                                   :title="tt('Export Results')"
                                   :cancel-button-title="tt('Close')"
                                   @cancel="cancel">
             <template #after-title>
                 <div ref="buttonContainer">
-                    <v-btn density="compact" color="default" variant="text" class="ms-2" :icon="true"
+                    <v-btn density="compact" color="default" variant="text" class="ms-2" :aria-label="tt('Copy')" :icon="true"
                            :disabled="!exportedData" @click="copy">
                         <v-icon :icon="mdiContentCopy" size="20" />
                         <v-tooltip activator="parent">{{ tt('Copy') }}</v-tooltip>
                     </v-btn>
-                    <v-btn density="compact" color="default" variant="text" class="ms-1" :icon="true"
+                    <v-btn density="compact" color="default" variant="text" class="ms-1" :aria-label="tt('Save')" :icon="true"
                            @click="save()">
                         <v-icon :icon="mdiContentSaveOutline" size="22" />
                         <v-tooltip activator="parent">{{ tt('Save') }}</v-tooltip>
@@ -23,7 +23,7 @@
                 <toggle-button class="ms-2" :false-name="tt('Table')" :true-name="tt('Raw Data')"
                                v-model="showRawData"/>
 
-                <v-btn density="compact" color="default" variant="text" class="ms-2" :icon="true">
+                <v-btn density="compact" color="default" variant="text" class="ms-2" :aria-label="tt('More')" :icon="true">
                     <v-icon :icon="mdiDotsVertical" size="22" />
                     <v-menu activator="parent">
                         <v-list>
@@ -65,8 +65,9 @@
             </template>
 
             <template #content>
-                <div class="d-flex flex-column flex-md-row flex-grow-1 overflow-y-auto" style="height: 530px">
+                <div class="d-flex flex-column flex-md-row flex-grow-1 h-100 overflow-y-auto">
                     <v-data-table
+                        class="h-100"
                         fixed-header
                         fixed-footer
                         multi-sort
@@ -318,3 +319,12 @@ defineExpose({
     open
 });
 </script>
+
+<style>
+.data-export-dialog-content {
+    min-width: min(560px, calc(100% - 48px));
+    min-height: 150px;
+    overflow: hidden;
+    resize: both;
+}
+</style>

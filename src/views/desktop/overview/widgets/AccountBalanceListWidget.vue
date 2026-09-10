@@ -15,7 +15,7 @@
                         </span>
                     </template>
                     <template #append>
-                        <span class="overview-widget__list-amount overview-widget__amount">{{ accountBalance(account, undefined, showAmount) }}</span>
+                        <span class="overview-widget__list-amount overview-widget__amount">{{ accountBalanceOrAvailableCredit(account, undefined, showAvailableCreditForCreditCard, showAmount, accountIds) }}</span>
                     </template>
                 </v-list-item>
             </v-list>
@@ -53,20 +53,21 @@ import {
 const props = defineProps<{
     loading: boolean;
     title?: string;
-    accountCategories: number[];
+    accountIds: string[];
     itemCount: number;
     sortBy: string;
     alwaysShowAmount: boolean;
+    showAvailableCreditForCreditCard: boolean;
     editing?: boolean
 }>();
 
 const { tt } = useI18n();
 
-const { accountBalance } = useAccountListPageBase();
+const { accountBalanceOrAvailableCredit } = useAccountListPageBase();
 
 const settingsStore = useSettingsStore();
 const accountsStore = useAccountsStore();
 
 const showAmount = computed<boolean>(() => !!props.alwaysShowAmount || settingsStore.appSettings.showAmountInHomePage);
-const displayAccounts = computed<Account[]>(() => accountsStore.getSortedAccounts(props.accountCategories, props.sortBy, props.itemCount));
+const displayAccounts = computed<Account[]>(() => accountsStore.getSortedAccounts(props.accountIds, props.sortBy, props.itemCount));
 </script>

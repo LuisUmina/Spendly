@@ -5,8 +5,8 @@
                 <template #title>
                     <div class="d-flex align-center">
                         <span>{{ tt('Data Management') }}</span>
-                        <v-btn density="compact" color="default" variant="text" size="24"
-                               class="ms-2" :icon="true" :loading="loadingDataStatistics" @click="reloadUserDataStatistics(true)">
+                        <v-btn density="compact" color="default" variant="text" size="24" class="ms-2"
+                               :aria-label="tt('Refresh')" :icon="true" :loading="loadingDataStatistics" @click="reloadUserDataStatistics(true)">
                             <template #loader>
                                 <v-progress-circular indeterminate size="20"/>
                             </template>
@@ -46,13 +46,13 @@
                             {
                                 title: 'Transaction Categories',
                                 count: displayDataStatistics ? displayDataStatistics.totalTransactionCategoryCount : '-',
-                                icon: mdiViewDashboardOutline,
+                                icon: mdiRhombusSplitOutline,
                                 color: 'teal'
                             },
                             {
                                 title: 'Transaction Tags',
                                 count: displayDataStatistics ? displayDataStatistics.totalTransactionTagCount : '-',
-                                icon: mdiTagOutline,
+                                icon: mdiPoundBoxOutline,
                                 color: 'grey'
                             },
                             {
@@ -195,8 +195,8 @@ import {
     mdiCreditCardOutline,
     mdiImage,
     mdiCompassOutline,
-    mdiViewDashboardOutline,
-    mdiTagOutline,
+    mdiRhombusSplitOutline,
+    mdiPoundBoxOutline,
     mdiClipboardTextOutline,
     mdiClipboardTextClockOutline,
     mdiShapePlusOutline,

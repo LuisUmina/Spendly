@@ -13,13 +13,13 @@
                                   :label="tt(setting.displayName)" :items="getItemCountOptions(setting.itemCountValues)"
                                   :model-value="getSettingValue(setting.settingName)"
                                   @update:model-value="updateSettingValue(setting, $event)"
-                                  v-if="setting.settingType === 'itemCountSelect'" />
+                                  v-if="setting.settingType === 'itemCountSelect' && (!setting.condition || setting.condition(widget?.settings))" />
 
                         <v-select :class="{ 'mt-4': index > 0 }" item-title="name" item-value="value"
                                   :label="tt(setting.displayName)" :items="getMonthOptions(setting.monthValues)"
                                   :model-value="getSettingValue(setting.settingName)"
                                   @update:model-value="updateSettingValue(setting, $event)"
-                                  v-else-if="setting.settingType === 'monthSelect'" />
+                                  v-else-if="setting.settingType === 'monthSelect' && (!setting.condition || setting.condition(widget?.settings))" />
 
                         <v-text-field class="always-cursor-pointer text-field-truncate"
                                       :class="{ 'mt-4': index > 0 }"
@@ -32,7 +32,7 @@
                                       :placeholder="tt('Default')"
                                       :model-value="getFilteredAccountsDisplayContent(setting)"
                                       @click="currentSettingItem = setting; showFilterAccountsDialog = true"
-                                      v-else-if="setting.settingType === 'accountSelect'" />
+                                      v-else-if="setting.settingType === 'accountSelect' && (!setting.condition || setting.condition(widget?.settings))" />
 
                         <v-text-field class="always-cursor-pointer text-field-truncate"
                                       :class="{ 'mt-4': index > 0 }"
@@ -45,7 +45,7 @@
                                       :placeholder="tt('Default')"
                                       :model-value="getFilteredTransactionCategoriesDisplayContent(setting)"
                                       @click="currentSettingItem = setting; showFilterTransactionCategoriesDialog = true"
-                                      v-else-if="setting.settingType === 'categorySelect'" />
+                                      v-else-if="setting.settingType === 'categorySelect' && (!setting.condition || setting.condition(widget?.settings))" />
 
                         <v-text-field class="always-cursor-pointer text-field-truncate"
                                       :class="{ 'mt-4': index > 0 }"
@@ -58,31 +58,31 @@
                                       :placeholder="tt('Default')"
                                       :model-value="getSettingValue(setting.settingName) ? tt('Custom') : tt('Default')"
                                       @click="currentSettingItem = setting; showFilterTransactionTagsDialog = true"
-                                      v-else-if="setting.settingType === 'tagSelect'" />
+                                      v-else-if="setting.settingType === 'tagSelect' && (!setting.condition || setting.condition(widget?.settings))" />
 
                         <v-select :class="{ 'mt-4': index > 0 }" item-title="name" item-value="value"
                                   :label="tt(setting.displayName)" :items="getCustomSelectOptions(setting)"
                                   :multiple="setting.multiple" :chips="setting.multiple" :closable-chips="setting.multiple"
                                   :model-value="getSettingValue(setting.settingName)"
                                   @update:model-value="updateSettingValue(setting, $event)"
-                                  v-else-if="setting.settingType === 'customSelect'" />
+                                  v-else-if="setting.settingType === 'customSelect' && (!setting.condition || setting.condition(widget?.settings))" />
 
-                        <v-switch :class="{ 'mt-2': index > 0 }" :label="tt(setting.displayName)"
+                        <v-switch :class="{ 'mt-2': index > 0 && supportsSettings[index - 1]?.settingType !== 'switch' }" :label="tt(setting.displayName)"
                                   :model-value="getSettingValue(setting.settingName)"
                                   @update:model-value="updateSettingValue(setting, $event)"
-                                  v-else-if="setting.settingType === 'switch'" />
+                                  v-else-if="setting.settingType === 'switch' && (!setting.condition || setting.condition(widget?.settings))" />
 
                         <amount-filter-input :class="{ 'mt-4': index > 0 }" :label="tt(setting.displayName)"
                                              :model-value="getSettingValue(setting.settingName) as string || ''"
                                              @update:model-value="updateSettingValue(setting, $event)"
-                                             v-else-if="setting.settingType === 'amount'" />
+                                             v-else-if="setting.settingType === 'amount' && (!setting.condition || setting.condition(widget?.settings))" />
 
                         <v-text-field :class="{ 'mt-4': index > 0 }" :label="tt(setting.displayName)"
                                       :placeholder="setting.placeholder ? tt(setting.placeholder) : undefined"
                                       :persistent-placeholder="!!setting.placeholder"
                                       :model-value="getSettingValue(setting.settingName)"
                                       @update:model-value="updateSettingValue(setting, $event)"
-                                      v-else-if="setting.settingType === 'textbox'" />
+                                      v-else-if="setting.settingType === 'textbox' && (!setting.condition || setting.condition(widget?.settings))" />
                     </template>
                 </div>
 
@@ -94,6 +94,7 @@
 
         <account-filter-settings-dialog type="custom"
                                         :selected-account-ids="(currentSettingItem?.settingType === 'accountSelect' && currentSettingItem?.settingName && isArray(getSettingValue(currentSettingItem.settingName))) ? getSettingValue(currentSettingItem.settingName) as string[] : []"
+                                        :disable-hidden-account="(currentSettingItem?.settingType === 'accountSelect') ? (currentSettingItem?.disableHiddenAccounts ?? false) : false"
                                         v-model:show="showFilterAccountsDialog"
                                         @settings:change="updateAccountValue"/>
 
@@ -119,7 +120,6 @@ import { ref, computed, useTemplateRef } from 'vue';
 
 import { useI18n } from '@/locales/helpers.ts';
 
-import { useSettingsStore } from '@/stores/setting.ts';
 import { useAccountsStore } from '@/stores/account.ts';
 import { useTransactionCategoriesStore } from '@/stores/transactionCategory.ts';
 import { useTransactionTagsStore } from '@/stores/transactionTag.ts';
@@ -143,12 +143,10 @@ type SnackBarType = InstanceType<typeof SnackBar>;
 const {
     tt,
     joinMultiText,
-    getAllAccountCategories,
     formatNumberToLocalizedNumerals,
     getTablePageOptions
 } = useI18n();
 
-const settingsStore = useSettingsStore();
 const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
 const transactionTagsStore = useTransactionTagsStore();
@@ -182,13 +180,6 @@ function getMonthOptions(values: number[]): NameNumeralValue[] {
 }
 
 function getCustomSelectOptions(setting: OverviewWidgetCustomSelectSettingItem): GenericNameValue<string | number>[] {
-    if (setting.selectValueSource === 'accountCategories') {
-        return [
-            { name: tt('All'), value: 0 },
-            ...getAllAccountCategories(settingsStore.appSettings.accountCategoryOrders).map(category => ({ name: category.displayName, value: category.type }))
-        ];
-    }
-
     return setting.selectValues.map(item => ({ name: tt(item.name), value: item.value }));
 }
 
@@ -218,6 +209,10 @@ function updateSettingValue(setting: OverviewWidgetSettingItem, value: OverviewW
             const selectedValues = value.filter(item => item !== allValue);
             widget.value.settings[setting.settingName] = selectedValues.length ? selectedValues : [allValue];
         }
+    } else if (setting.settingType === 'customSelect' && setting.multiple && isArray(value)) {
+        if (value.length >= (setting.minSelections ?? 0)) {
+            widget.value.settings[setting.settingName] = value;
+        }
     } else {
         widget.value.settings[setting.settingName] = value;
     }
@@ -239,7 +234,7 @@ function getFilteredAccountsDisplayContent(setting: OverviewWidgetSettingItem): 
     let allAccountSelected = true;
     const selectedAccountNames: string[] = [];
 
-    for (const account of accountsStore.allPlainAccounts) {
+    for (const account of accountsStore.allVisiblePlainAccounts) {
         if (account.type === AccountType.MultiSubAccounts.type) {
             continue;
         }

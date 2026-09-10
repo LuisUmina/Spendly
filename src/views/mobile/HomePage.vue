@@ -4,7 +4,7 @@
             <f7-nav-title :title="tt('global.app.title')"></f7-nav-title>
         </f7-navbar>
 
-        <overview-dashboard :layout="layout" :loading="loading" />
+        <overview-dashboard :layout="layout" :loading="loading" @navigate="onNavigate" />
 
         <f7-toolbar tabbar icons bottom class="main-tabbar">
             <f7-link class="link" href="/transaction/list">
@@ -17,7 +17,9 @@
             </f7-link>
             <!-- "homepage-add-button" must have the "dragenabled" class, otherwise the popover disappears immediately after the second long press -->
             <f7-link id="homepage-add-button" class="link dragenabled"
-                     href="/transaction/add" @taphold="openTransactionTemplatePopover">
+                     href="/transaction/add"
+                     :aria-label="tt('Add Transaction')"
+                     @taphold="openTransactionTemplatePopover">
                 <f7-icon f7="plus_square" class="ebk-tarbar-big-icon"></f7-icon>
             </f7-link>
             <f7-link class="link" href="/statistic/transaction">
@@ -233,6 +235,12 @@ function reloadOverviewData(force: boolean): Promise<unknown>[] {
         }));
     }
 
+    if (requirements.includes(OverviewWidgetDataRequirement.CurrentMonthTransactions)) {
+        promises.push(overviewStore.loadCurrentMonthTransactions({
+            force: force
+        }));
+    }
+
     if (requirements.includes(OverviewWidgetDataRequirement.DailyTransactionAmounts)) {
         promises.push(overviewStore.loadTransactionDailyAmounts({
             force: force,
@@ -317,6 +325,12 @@ function onReceiptRecognitionChanged(result: AIImageRecognitionResult): void {
             autoUploadPicture: autoUploadRecognizedImage ? result.imageFile : undefined,
         }
     });
+}
+
+function onNavigate(path: string): void {
+    if (path) {
+        props.f7router.navigate(path);
+    }
 }
 
 function onPageAfterIn(): void {
