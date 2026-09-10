@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Generic Technical Branding System v0.3</title>
+<style>
+:root{
+  --bg:#fff;--bg2:#f5f5f7;--surface:#fff;--surface2:#fbfbfc;--ink:#111;--muted:#5f6368;--line:#e6e7ea;
+  --primary:#0a6cff;--cyan:#3bc8ff;--violet:#6e5cff;--magenta:#d84ca3;--orange:#ff7a1a;--hero:#050505;
+  --shadow:0 8px 28px rgba(0,0,0,.08);--glow:0 0 80px rgba(46,116,255,.18);
+}
+[data-theme="dark"]{
+  --bg:#0a0a0b;--bg2:#101113;--surface:#111214;--surface2:#15171a;--ink:#f5f7fa;--muted:#b2b8c0;--line:#25282d;
+  --primary:#5ea1ff;--cyan:#6ddcff;--violet:#9a8cff;--magenta:#f076c4;--orange:#ffa24d;--hero:#050505;
+  --shadow:0 10px 30px rgba(0,0,0,.35);--glow:0 0 100px rgba(94,161,255,.2);
+}
+*{box-sizing:border-box} html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:-.012em;transition:.22s background,.22s color}
+a{text-decoration:none;color:inherit}
+.wrap{max-width:1440px;margin:auto;padding:0 clamp(20px,4vw,64px)}
+nav{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 82%, transparent);backdrop-filter:blur(18px);border-bottom:1px solid color-mix(in srgb, var(--ink) 8%, transparent)}
+.nav{height:68px;display:flex;align-items:center;justify-content:space-between}
+.brand{font-weight:650}
+.links{display:flex;gap:22px;color:var(--muted);font-size:14px}
+.actions{display:flex;gap:12px;align-items:center}
+.toggle,.pill{border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:10px 16px;border-radius:999px;cursor:pointer;font:inherit;font-size:14px}
+.pill.dark{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.hero{min-height:78vh;display:grid;place-items:center;text-align:center;position:relative;overflow:hidden}
+.hero:before{content:"";position:absolute;top:-220px;width:880px;height:880px;border-radius:50%;background:radial-gradient(circle at 50% 50%,color-mix(in srgb, var(--primary) 22%, transparent),transparent 64%)}
+.kicker{font-size:13px;color:var(--muted);margin-bottom:22px}
+h1{font-size:clamp(56px,8vw,118px);line-height:.93;letter-spacing:-.06em;font-weight:520;margin:0}
+.hero p{max-width:780px;margin:26px auto 34px;font-size:clamp(18px,2vw,24px);line-height:1.45;color:var(--muted)}
+.btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+section{padding:clamp(72px,10vw,150px) 0}
+.alt{background:var(--bg2)}
+.eyebrow{font-size:13px;color:var(--muted);margin-bottom:14px}
+h2{font-size:clamp(38px,5vw,72px);line-height:1;letter-spacing:-.045em;font-weight:520;margin:0 0 18px}
+.lead{font-size:20px;line-height:1.5;color:var(--muted);max-width:760px}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:18px;margin-top:46px}
+.card{grid-column:span 4;background:var(--surface);border:1px solid var(--line);border-radius:28px;padding:30px;box-shadow:var(--shadow)}
+.card.two{grid-column:span 6}
+.card h3{font-size:24px;margin:14px 0 10px}
+.card p{color:var(--muted);line-height:1.55;margin:0}
+.swatch{height:96px;border-radius:22px;border:1px solid color-mix(in srgb,var(--ink) 8%, transparent);display:flex;align-items:flex-end;padding:12px;font-size:13px}
+.white{background:#fff;color:#111}.soft{background:#f5f5f7;color:#111}.blue{background:#0a6cff;color:#fff}.black{background:#050505;color:#fff}
+.spectral{background:linear-gradient(90deg,var(--primary),var(--cyan),var(--violet),var(--magenta),var(--orange));color:#fff}
+.showcase{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;align-items:stretch;margin-top:42px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:32px;padding:34px;position:relative;overflow:hidden}
+.panel.dark{background:var(--hero);border-color:#101012;color:#fff}
+.panel.dark p{color:#b7bec8}
+.mini-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:24px}
+.mini{padding:24px;border-radius:26px;border:1px solid var(--line);background:var(--surface2)}
+.stat{font-size:38px;letter-spacing:-.04em}
+.orbitwrap{min-height:480px;display:grid;place-items:center}
+.orbit{width:280px;height:280px;border:42px solid color-mix(in srgb,var(--primary) 45%, transparent);border-radius:50%;filter:blur(11px);box-shadow:var(--glow)}
+.spark{position:absolute;width:5px;height:11px;border-radius:6px;left:50%;top:50%;transform-origin:0 -200px;opacity:.9}
+.sample-window{background:var(--surface);border:1px solid var(--line);border-radius:28px;padding:22px}
+.toolbar{display:flex;gap:8px;margin-bottom:14px}
+.dot{width:10px;height:10px;border-radius:50%;background:#ff5f57}.dot:nth-child(2){background:#febc2e}.dot:nth-child(3){background:#28c840}
+.control{height:46px;border:1px solid var(--line);border-radius:16px;padding:0 14px;display:flex;align-items:center;color:#8a9098;background:var(--surface)}
+.menu{margin-top:14px;display:grid;gap:10px}
+.item{padding:14px 16px;border-radius:18px;background:var(--bg2);display:flex;justify-content:space-between}
+.badge{padding:8px 12px;border-radius:999px;background:color-mix(in srgb,var(--primary) 12%, var(--surface));color:var(--primary);font-size:13px}
+.chart{height:170px;border-radius:22px;background:linear-gradient(to top,color-mix(in srgb,var(--primary) 10%, transparent), transparent 60%),linear-gradient(color-mix(in srgb,var(--ink) 5%, transparent) 1px, transparent 1px);background-size:100% 100%,100% 34px;overflow:hidden}
+svg{width:100%;height:100%}
+.code{margin-top:20px;background:#0a0a0b;color:#eef1f5;border-radius:24px;padding:22px;font:13px/1.65 SFMono-Regular,Consolas,monospace;overflow:auto}
+.rule{display:grid;grid-template-columns:56px 1fr;gap:16px;padding:18px 0;border-bottom:1px solid var(--line)}
+.num{font-size:13px;color:var(--muted)}
+@media(max-width:960px){.links{display:none}.card,.card.two{grid-column:1/-1}.showcase{grid-template-columns:1fr}}
+</style>
+</head>
+<body data-theme="light">
+<nav><div class="wrap nav">
+  <div class="brand">Generic Rebrand System <span style="color:var(--muted);font-weight:450">v0.3</span></div>
+  <div class="links"><a href="#foundation">Foundation</a><a href="#themes">Themes</a><a href="#components">Components</a><a href="#agents">Agents</a></div>
+  <div class="actions"><button class="toggle" id="themeToggle">Switch to dark</button><a class="pill dark" href="#agents">Agent spec</a></div>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="kicker">PROJECT-AGNOSTIC BRANDING SYSTEM</div>
+  <h1>Quiet interfaces.<br/>Bold moments.</h1>
+  <p>A reusable technical branding guide for future products: color system, typography, component forms, layout behavior, motion, dark mode, and agent-ready implementation rules.</p>
+  <div class="btns"><a class="pill dark" href="#foundation">Explore system</a><a class="pill" href="#components">View components</a></div>
+</div></header>
+
+<section id="foundation" class="alt"><div class="wrap">
+  <div class="eyebrow">01 · FOUNDATION</div>
+  <h2>Calm by default.<br/>Expressive on purpose.</h2>
+  <p class="lead">The interface should remain mostly neutral. Stronger visual energy should appear only in intentional moments: hero sections, technical showcases, AI surfaces, visualizations, and key transitions.</p>
+  <div class="grid">
+    <div class="card"><div class="swatch white">Canvas</div><h3>Clean base</h3><p>White or near-white is the main canvas for clarity and calm hierarchy.</p></div>
+    <div class="card"><div class="swatch soft">Support surface</div><h3>Soft structure</h3><p>Use subtle gray sections or panels to separate content without visual clutter.</p></div>
+    <div class="card"><div class="swatch blue">Functional blue</div><h3>Interactive accent</h3><p>Use for links, active states, focus, and carefully selected primary emphasis.</p></div>
+    <div class="card two"><div class="swatch black">Dark showcase</div><h3>Immersive utility</h3><p>Use near-black surfaces for technical moments, code previews, dashboards, or focused product highlights.</p></div>
+    <div class="card two"><div class="swatch spectral">Decorative spectrum</div><h3>Brand energy</h3><p>Reserve spectral accents for halos, particles, visual identity, and selected visualizations—not for everything.</p></div>
+  </div>
+</div></section>
+
+<section id="themes"><div class="wrap">
+  <div class="eyebrow">02 · LIGHT & DARK</div>
+  <h2>Two complete themes.<br/>One coherent system.</h2>
+  <p class="lead">Light mode is the default workspace. Dark mode is a deliberate focused mode with careful contrast, not a crude inversion.</p>
+  <div class="showcase">
+    <div class="panel">
+      <h3 style="font-size:34px;margin:0 0 14px">Theme behavior</h3>
+      <p style="color:var(--muted)">Both themes preserve the same spacing rhythm, radius family, typography hierarchy, and component behavior. Only the visual environment changes.</p>
+      <div class="mini-grid">
+        <div class="mini"><div class="stat">44px</div><div style="color:var(--muted)">Default button height</div></div>
+        <div class="mini"><div class="stat">28px</div><div style="color:var(--muted)">Card radius</div></div>
+        <div class="mini"><div class="stat">220ms</div><div style="color:var(--muted)">Standard motion</div></div>
+        <div class="mini"><div class="stat">Blue</div><div style="color:var(--muted)">Functional accent</div></div>
+      </div>
+    </div>
+    <div class="panel dark orbitwrap"><div class="orbit"></div></div>
+  </div>
+</div></section>
+
+<section id="components" class="alt"><div class="wrap">
+  <div class="eyebrow">03 · COMPONENTS</div>
+  <h2>Rebrand the primitives.<br/>Then the screens.</h2>
+  <div class="showcase">
+    <div class="panel">
+      <div class="badge">Component preview</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 18px">
+        <button class="pill dark">Primary</button>
+        <button class="pill">Secondary</button>
+        <button class="pill" style="background:var(--primary);color:#fff;border-color:var(--primary)">Blue</button>
+      </div>
+      <div class="sample-window">
+        <div class="toolbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+        <div class="control">Search, command, or input…</div>
+        <div class="menu">
+          <div class="item"><span>Overview</span><span>⌘1</span></div>
+          <div class="item"><span>Analytics</span><span>⌘2</span></div>
+          <div class="item"><span>Settings</span><span>⌘,</span></div>
+        </div>
+      </div>
+      <div class="chart" style="margin-top:16px">
+        <svg viewBox="0 0 100 40" preserveAspectRatio="none">
+          <polyline fill="none" stroke="var(--primary)" stroke-width="2" points="0,28 10,26 20,27 30,21 40,22 50,18 60,17 70,12 80,14 90,10 100,9"/>
+        </svg>
+      </div>
+    </div>
+    <div class="panel dark">
+      <h3 style="font-size:34px;margin:0 0 14px">Technical surface</h3>
+      <p>Dark utility surfaces are ideal for code, AI activity, command outputs, logs, or technical workflows.</p>
+      <div class="code">$ agent rebrand ./target-app
+✓ tokens added
+✓ light theme mapped
+✓ dark theme mapped
+→ next: buttons, inputs, cards, tables
+
+notes:
+- preserve functionality
+- respect reduced motion
+- remove hard-coded colors</div>
+    </div>
+  </div>
+</div></section>
+
+<section id="agents"><div class="wrap">
+  <div class="eyebrow">04 · AGENT RULES</div>
+  <h2>Reusable by humans.<br/>Executable by agents.</h2>
+  <div style="max-width:980px;margin-top:28px">
+    <div class="rule"><div class="num">01</div><div><b>Tokenize first.</b><br/><span style="color:var(--muted)">Map colors, spacing, radius, type, and motion to semantic tokens before rebranding screens.</span></div></div>
+    <div class="rule"><div class="num">02</div><div><b>Implement both themes.</b><br/><span style="color:var(--muted)">Support light and dark as first-class themes.</span></div></div>
+    <div class="rule"><div class="num">03</div><div><b>Start with primitives.</b><br/><span style="color:var(--muted)">Buttons, inputs, cards, tables, nav, modals, then higher-level pages.</span></div></div>
+    <div class="rule"><div class="num">04</div><div><b>Preserve functionality.</b><br/><span style="color:var(--muted)">This is a UX/UI rebrand, not a silent logic rewrite.</span></div></div>
+    <div class="rule"><div class="num">05</div><div><b>Keep charts restrained.</b><br/><span style="color:var(--muted)">Readable, meaningful, and low-noise visualizations only.</span></div></div>
+    <div class="rule"><div class="num">06</div><div><b>Respect accessibility.</b><br/><span style="color:var(--muted)">Contrast, focus states, hit targets, keyboard support, and reduced motion are mandatory.</span></div></div>
+  </div>
+  <div class="code">Read:
+- BRAND_GUIDE.v3.generic.md
+- COMPONENT_SPEC.v3.md
+- MOTION_SPEC.v3.md
+- design-tokens.v3.generic.json
+
+Then apply the rebrand to the target application.
+
+Requirements:
+1. Preserve functionality.
+2. Preserve IA unless explicitly changing UX.
+3. Support light and dark themes.
+4. Use semantic tokens only.
+5. Rebrand primitives before pages.
+6. Remove hard-coded legacy styles where tokens exist.
+7. Return changed files, token mapping, migrated components, and remaining visual debt.</div>
+</div></section>
+
+<script>
+const root=document.body, btn=document.getElementById('themeToggle');
+btn.addEventListener('click',()=>{
+  const next=root.getAttribute('data-theme')==='light'?'dark':'light';
+  root.setAttribute('data-theme',next);
+  btn.textContent=next==='light'?'Switch to dark':'Switch to light';
+});
+for(let i=0;i<72;i++){
+  const s=document.createElement('i'); s.className='spark';
+  const a=(360/72)*i, r=150+Math.random()*170;
+  s.style.transform=`rotate(${a}deg) translateY(-${r}px) rotate(${-a}deg)`;
+  s.style.height=(5+Math.random()*8)+'px';
+  s.style.background=['var(--primary)','var(--cyan)','var(--violet)','var(--magenta)','var(--orange)'][i%5];
+  document.querySelector('.orbitwrap').appendChild(s);
+}
+</script>
+</body></html>
