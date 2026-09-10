@@ -14,7 +14,7 @@
                        :disabled="!hasAnyAvailableAccount" @click="save">{{ tt(applyText) }}</v-btn>
 
                 <v-btn density="compact" color="default" variant="text" class="ms-2"
-                       :disabled="loading || !hasAnyAvailableAccount" :icon="true">
+                       :aria-label="tt('More')" :disabled="loading || !hasAnyAvailableAccount" :icon="true">
                     <v-icon :icon="mdiDotsVertical" />
                     <v-menu activator="parent">
                         <v-list>
@@ -157,6 +157,7 @@ type SnackBarType = InstanceType<typeof SnackBar>;
 const props = defineProps<{
     type: AccountFilterType;
     selectedAccountIds?: string[];
+    disableHiddenAccount?: boolean;
     autoSave?: boolean;
     show: boolean;
 }>();
@@ -184,7 +185,7 @@ const {
     isAccountChecked,
     loadFilterAccountIds,
     saveFilterAccountIds
-} = useAccountFilterSettingPageBase(props.type);
+} = useAccountFilterSettingPageBase(props.type, computed(() => props.disableHiddenAccount));
 
 const accountsStore = useAccountsStore();
 

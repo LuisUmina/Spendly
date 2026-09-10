@@ -3,10 +3,11 @@
                           v-if="widget.type === OverviewWidgetType.AssetSummary" />
 
     <account-balance-list-widget :loading="loading" :editing="editing" :title="widgetTitle"
-                                 :account-categories="widget.settings['accountCategories'] as number[]"
+                                 :account-ids="widget.settings['accountIds'] as string[]"
                                  :item-count="widget.settings['itemCount'] as number"
                                  :sort-by="widget.settings['sortBy'] as string"
                                  :always-show-amount="widget.settings['alwaysShowAmount'] as boolean"
+                                 :show-available-credit-for-credit-card="widget.settings['showAvailableCreditForCreditCard'] as boolean"
                                  v-else-if="widget.type === OverviewWidgetType.AccountBalanceList" />
 
     <monthly-expense-overview-widget :loading="loading"
@@ -25,12 +26,16 @@
                                                v-else-if="widget.type === OverviewWidgetType.PeriodNetIncomeAndSavingsRate" />
 
     <income-expense-trend-widget :loading="loading" :title="widgetTitle"
+                                 :chart-type="widget.settings['chartType'] as number"
+                                 :transaction-types="widget.settings['transactionTypes'] as number[]"
                                  :months="widget.settings['months'] as number"
+                                 :smooth-curve="widget.settings['smoothCurve'] as boolean"
                                  :show-x-axis-labels="widget.settings['showXAxisLabels'] as boolean"
                                  :show-legend="widget.settings['showLegend'] as boolean"
                                  v-else-if="widget.type === OverviewWidgetType.IncomeExpenseTrend" />
 
     <net-assets-trend-widget :loading="loading" :title="widgetTitle" :months="widget.settings['months'] as number"
+                             :smooth-curve="widget.settings['smoothCurve'] as boolean"
                              :show-x-axis-labels="widget.settings['showXAxisLabels'] as boolean"
                              :show-legend="widget.settings['showLegend'] as boolean"
                              v-else-if="widget.type === OverviewWidgetType.NetAssetsTrend" />
@@ -51,6 +56,12 @@
                                 @refresh="$emit('refresh')"
                                 v-else-if="widget.type === OverviewWidgetType.RecentTransactions" />
 
+    <transaction-calendar-widget :loading="loading" :editing="editing" :title="widgetTitle"
+                                 :transaction-types="widget.settings['transactionTypes'] as number[]"
+                                 :show-alternate-date="widget.settings['showAlternateDate'] as boolean"
+                                 :show-amount="widget.settings['showAmount'] as boolean"
+                                 v-else-if="widget.type === OverviewWidgetType.TransactionCalendar" />
+
     <transaction-calendar-heatmap-widget :loading="loading" :editing="editing" :title="widgetTitle"
                                          :transaction-type="widget.settings['transactionType'] as TransactionType"
                                          :months="widget.settings['months'] as number"
@@ -70,6 +81,7 @@ import NetAssetsTrendWidget from './widgets/NetAssetsTrendWidget.vue';
 import AccountBalanceListWidget from './widgets/AccountBalanceListWidget.vue';
 import ExpenseCategoryRankingWidget from './widgets/ExpenseCategoryRankingWidget.vue';
 import RecentTransactionsWidget from './widgets/RecentTransactionsWidget.vue';
+import TransactionCalendarWidget from './widgets/TransactionCalendarWidget.vue';
 import TransactionCalendarHeatmapWidget from './widgets/TransactionCalendarHeatmapWidget.vue';
 
 import { TransactionType } from '@/core/transaction.ts';
@@ -84,12 +96,13 @@ const props = defineProps<{
     editing?: boolean
 }>();
 
+defineEmits<{
+    (e: 'refresh'): void
+}>();
+
 const widgetTitle = computed<string>(() => {
     const title = props.widget.settings['title'];
     return typeof title === 'string' ? title.trim() : '';
 });
 
-defineEmits<{
-    (e: 'refresh'): void
-}>();
 </script>

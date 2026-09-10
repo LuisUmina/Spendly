@@ -6,14 +6,16 @@
 
         <v-card-text class="overview-widget__body">
             <div class="expense-progress-widget__amount text-truncate">
-                <span class="overview-widget__amount text-headline-small" :class="{ 'text-expense': !!currentDisplayExpenseAmount }" v-if="!loading || currentDisplayExpenseAmount">{{ currentDisplayExpenseAmount !== '' ? currentDisplayExpenseAmount : tt('No data') }}</span>
-                <v-skeleton-loader class="skeleton-no-margin mt-2 mb-4" type="text" width="120px" :loading="true" v-else-if="loading && !currentDisplayExpenseAmount"></v-skeleton-loader>
+                <span class="overview-widget__amount text-headline-small"
+                      :class="{ 'text-expense': !!currentDisplayExpenseAmount, 'text-medium-emphasis': !currentDisplayExpenseAmount }"
+                      v-if="!loading || currentDisplayExpenseAmount">{{ currentDisplayExpenseAmount !== '' ? currentDisplayExpenseAmount : tt('No data') }}</span>
+                <v-skeleton-loader class="skeleton-no-margin mt-h1 pt-2 mb-2" type="text" width="120px" :loading="true" v-else-if="loading && !currentDisplayExpenseAmount"></v-skeleton-loader>
             </div>
             <div class="overview-widget__caption d-flex justify-space-between mt-2">
                 <span>{{ tt('Month elapsed') }}</span>
                 <span class="font-weight-medium">{{ displayElapsedPercent }}</span>
             </div>
-            <v-progress-linear class="mt-2" color="primary" rounded height="6" :model-value="currentMonthElapsedPercent * 100" :aria-label="tt('Month elapsed')" />
+            <v-progress-linear class="mt-2" color="primary" rounded height="6" :model-value="currentMonthElapsedPercent * 100" />
             <div class="expense-progress-widget__projection mt-3 pt-3">
                 <div class="overview-widget__detail-row">
                     <span class="text-truncate">{{ tt('Estimated month-end expense') }}</span>

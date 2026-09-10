@@ -1,20 +1,20 @@
 <template>
     <main-page-layout no-navbar>
         <template #top-toolbar>
-            <v-btn class="top-navigation-button" density="comfortable" variant="text" :icon="true"
-                   color="primary" :aria-label="tt('Save')" @click="save">
+            <v-btn class="top-navigation-button" density="comfortable" variant="text" color="primary"
+                   :aria-label="tt('Save')" :disabled="loadingOverview" :icon="true" @click="save">
                 <v-icon :icon="mdiContentSaveOutline" size="24" />
                 <v-tooltip activator="parent">{{ tt('Save') }}</v-tooltip>
             </v-btn>
 
-            <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text" :icon="true"
-                   :aria-label="tt('Cancel')" @click="cancel">
+            <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text"
+                   :aria-label="tt('Cancel')" :disabled="loadingOverview" :icon="true" @click="cancel">
                 <v-icon :icon="mdiClose" size="24" />
                 <v-tooltip activator="parent">{{ tt('Cancel') }}</v-tooltip>
             </v-btn>
 
-            <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text" :icon="true"
-                   :aria-label="tt('More')">
+            <v-btn class="top-navigation-button ms-1" density="comfortable" variant="text"
+                   :aria-label="tt('More')" :disabled="loadingOverview" :icon="true">
                 <v-icon :icon="mdiDotsVertical" size="24" />
                 <v-tooltip activator="parent">{{ tt('More') }}</v-tooltip>
                 <v-menu activator="parent">
@@ -40,7 +40,7 @@
 
     <add-widget-dialog ref="addWidgetDialog" />
     <widget-settings-dialog ref="widgetSettingsDialog" />
-    <json-import-dialog ref="layoutImportDialog" :title="tt('Import Layout')" :on-import="onImportLayout" />
+    <json-import-dialog ref="layoutImportDialog" :title="tt('Import Layout')" :placeholder="layoutJsonPlaceholder" :on-import="onImportLayout" />
     <json-export-dialog ref="layoutExportDialog" :title="tt('Export Layout')" :file-name="tt('dataExport.defaultOverviewLayoutFileName')" />
 
     <confirm-dialog ref="confirmDialog" />
@@ -126,6 +126,20 @@ const accountsStore = useAccountsStore();
 const transactionCategoriesStore = useTransactionCategoriesStore();
 const overviewStore = useOverviewStore();
 
+const layoutJsonPlaceholder: string = `{
+    "widgets": [
+        {
+            "id": "widget-id",
+            "type": "widget-type",
+            "x": 0,
+            "y": 0,
+            "w": 0,
+            "h": 0,
+            "settings": {}
+        }
+    ]
+}`;
+
 const confirmDialog = useTemplateRef<ConfirmDialogType>('confirmDialog');
 const snackbar = useTemplateRef<SnackBarType>('snackbar');
 const addWidgetDialog = useTemplateRef<AddWidgetDialogType>('addWidgetDialog');
@@ -190,6 +204,12 @@ function reload(force: boolean): void {
         promises.push(overviewStore.loadRecentTransactions({
             force: force,
             queries: getOverviewRecentTransactionsQueries(draftLayout.value)
+        }));
+    }
+
+    if (requirements.includes(OverviewWidgetDataRequirement.CurrentMonthTransactions)) {
+        promises.push(overviewStore.loadCurrentMonthTransactions({
+            force: force
         }));
     }
 
@@ -311,7 +331,7 @@ function save(): void {
 function cancel(): void {
     const leave = () => {
         leavingAfterAction.value = true;
-        router.push('/app/settings/basic');
+        router.push('/settings/preferences');
     };
 
     if (!isModified.value) {
